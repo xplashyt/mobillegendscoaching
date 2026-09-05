@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tinta: #111a22;
+  --niebla: #e8eef3;
+  --papel: #f8fafb;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--niebla);
+  color: var(--tinta);
+  font-family: var(--font-spline), sans-serif;
+}
+
+button,
+input,
+summary {
+  font: inherit;
+}
+
+::selection {
+  background: #d5a021;
+  color: #111a22;
+}
+
+:focus-visible {
+  outline: 3px solid #d5a021;
+  outline-offset: 3px;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #173a63;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.field-input {
+  width: 100%;
+  border: 2px solid #111a22;
+  background: #f8fafb;
+  padding: 0.9rem 1rem;
+  color: #111a22;
+  outline: none;
+}
+
+.field-input:focus {
+  border-color: #16836f;
+  box-shadow: 4px 4px 0 #d5a021;
+}
+
+.field-input::placeholder {
+  color: rgb(23 58 99 / 45%);
+}
+
+.board-route {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: trace-route 850ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.role-chip {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: place-chip 320ms ease-out forwards;
+}
+
+@keyframes trace-route {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes place-chip {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .board-route,
+  .role-chip {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+  }
+}
