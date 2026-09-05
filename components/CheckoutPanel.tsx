@@ -49,6 +49,8 @@ interface FailureInfo {
 function failureInfo(rawMessage: string, code?: string | null, details: string[] = []): FailureInfo {
   const raw = rawMessage || "La pasarela no devolvió un motivo específico.";
   const text = `${code ?? ""} ${raw}`.toLowerCase();
+  if (text.includes("la transacción fue rechazada (sandbox)")) return { title: "Pago de prueba rechazado", raw, code, details, explanation: "Wompi devolvió el rechazo simulado de la tarjeta de prueba. No se realizó un cobro real." };
+  if (/failed to fetch|fetch failed|networkerror|load failed|conectar|conexión|llave de cifrado/i.test(text)) return { title: "No pudimos confirmar el pago", raw, code, details, explanation: "Hubo un problema de conexión. Esto no confirma un rechazo del banco. Consulta el estado en Wompi con la referencia antes de repetir el pago." };
 
   if (/ws05|por motivos de seguridad|security/.test(text)) {
     return {
@@ -349,10 +351,10 @@ function CheckoutContent({ plan, onClose }: { plan: Plan; onClose: () => void })
         {phase === "rechazado" && failure && (
           <div className="px-6 py-10 sm:px-10" aria-live="assertive">
             <span className="grid h-16 w-16 place-items-center rounded-full border-4 border-alerta font-display text-3xl font-extrabold text-alerta">!</span>
-            <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-alerta">Estado no aprobado</p>
+            <p className="mt-7 text-xs font-bold uppercase tracking-[0.18em] text-alerta">Resultado del intento</p>
             <h3 className="mt-3 max-w-2xl font-display text-5xl font-extrabold uppercase leading-[0.9] text-cobalto sm:text-6xl">{failure.title}</h3>
             <p className="mt-5 max-w-2xl text-lg font-semibold leading-7">{failure.explanation}</p>
-            <div className="mt-7 border-l-4 border-alerta bg-papel p-5"><p className="text-xs font-bold uppercase tracking-[0.14em] text-cobalto">Mensaje exacto de la pasarela</p><p className="mt-2 whitespace-pre-wrap leading-6">{failure.raw}</p>{failure.code && <p className="mt-3 text-sm font-semibold tracking-[0.04em] text-cobalto">Código: {failure.code}</p>}{extraDetails.length > 0 && <ul className="mt-4 list-inside list-disc space-y-1 text-sm">{extraDetails.map((detail) => <li key={detail}>{detail}</li>)}</ul>}</div>
+            <div className="mt-7 border-l-4 border-alerta bg-papel p-5"><p className="text-xs font-bold uppercase tracking-[0.14em] text-cobalto">Detalle del resultado</p><p className="mt-2 whitespace-pre-wrap leading-6">{failure.raw}</p>{failure.code && <p className="mt-3 text-sm font-semibold tracking-[0.04em] text-cobalto">Código: {failure.code}</p>}{extraDetails.length > 0 && <ul className="mt-4 list-inside list-disc space-y-1 text-sm">{extraDetails.map((detail) => <li key={detail}>{detail}</li>)}</ul>}</div>
             {reference && <p className="mt-5 break-all text-xs font-semibold tracking-[0.04em] text-cobalto">Ref. {reference}</p>}
             <div className="mt-7 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={() => setPhase("form")} className="bg-tinta px-6 py-3 font-display text-lg font-bold uppercase text-papel">Corregir datos</button><a href={`mailto:${CORREO_CONTACTO}?subject=${encodeURIComponent(`Ayuda con pago ${reference}`)}`} className="border-2 border-tinta px-6 py-3 text-center font-display text-lg font-bold uppercase">Pedir ayuda</a></div>
           </div>
